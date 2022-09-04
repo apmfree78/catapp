@@ -1,9 +1,15 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { waitFor, render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+test('button should be rendered', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  const buttonEl = screen.getByRole('button');
+  expect(buttonEl).toBeInTheDocument();
+});
+
+test('img should be rendered', async () => {
+  render(<App />);
+  const image = screen.getByAltText('cute cat photo');
+  await waitFor(() => expect(image).toHaveAttribute('src'));
 });

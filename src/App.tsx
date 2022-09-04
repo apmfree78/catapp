@@ -52,18 +52,25 @@ function App() {
     getCats();
   }, []);
 
-  // return jsx showing cat picture and image id
+  // return jsx showing cat picture and button
+  // to load next cat picture
   return (
     <div className='App'>
       {loading && <p>Loading...</p>}
-      {error && <p>{error}</p>}
-      {cats && (
+      {error && <p data-testid='error'>{error}</p>}
+      {cats.id !== '' && (
         <div style={{ margin: '15px' }}>
-          <img style={{ height: '50vmin' }} src={cats.url} />
-          <p>image ID: {cats.id}</p>
+          <img
+            style={{ height: '50vmin' }}
+            src={cats.url}
+            alt='cute cat photo'
+          />
+          {/* <p>image ID: {cats.id}</p> */}
         </div>
       )}
-      <button onClick={getCats}>Get Cute Cat Pic</button>
+      <button disabled={loading} onClick={getCats}>
+        Get Cute Cat Pic
+      </button>
     </div>
   );
 }
