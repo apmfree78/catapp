@@ -31,8 +31,7 @@ function App() {
       .get(`${CAT_URL}/images/search`)
       .catch((err) => {
         // set error state
-        setError(err.message);
-        setLoading(false);
+        dispatch({ type: ActionType.FETCH_ERROR, payload: err.message });
         console.error(err);
       });
 
@@ -40,7 +39,10 @@ function App() {
     setLoading(false);
 
     if (!response) {
-      setError('no cat images found! sorry!');
+      dispatch({
+        type: ActionType.FETCH_ERROR,
+        payload: 'sorry, cat is napping and not avaliable for pics today!',
+      });
       return;
     }
 
@@ -50,7 +52,13 @@ function App() {
     console.log({ url, id });
 
     // setting state
-    setCats({ url, id });
+    dispatch({
+      type: ActionType.FETCH_SUCCESS,
+      payload: {
+        id,
+        url,
+      },
+    });
   };
 
   // load random cat image on load
