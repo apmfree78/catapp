@@ -1,24 +1,30 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import './App.css';
 import axios, { AxiosResponse } from 'axios';
-
-interface CatTributes {
-  id: string;
-  url: string;
-}
+import {
+  ActionType,
+  CatFetchState,
+  catFetchReducer,
+  CatTributes,
+  initialState,
+} from './catReducer';
 
 const CAT_URL = 'https://api.thecatapi.com/v1';
-
+const initialFetchState: CatFetchState = {
+  loading: false,
+  error: '',
+  cat: initialState,
+};
 function App() {
+  const [state, dispatch] = useReducer(catFetchReducer, initialFetchState);
   const [cats, setCats] = useState<CatTributes>({ id: '', url: '' });
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string>('');
 
   // get random cat image from API
   const getCats = async () => {
     // loading state begins
-    setLoading(true);
-    setError('');
+    dispatch({ type: ActionType.FETCH_START });
 
     // grab random cat photo
     const response: void | AxiosResponse = await axios
