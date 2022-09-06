@@ -10,6 +10,6 @@ test('button should be rendered', () => {
 
 test('img should be rendered', async () => {
   render(<App />);
-  const image = screen.getByAltText('cute cat photo');
+  const image = screen.getByAltText('cute cat');
   await waitFor(() => expect(image).toHaveAttribute('src'));
 });

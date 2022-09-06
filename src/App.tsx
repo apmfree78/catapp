@@ -1,11 +1,10 @@
-import { useEffect, useReducer, useState } from 'react';
+import { useEffect, useReducer } from 'react';
 import './App.css';
 import axios, { AxiosResponse } from 'axios';
 import {
   ActionType,
   CatFetchState,
   catFetchReducer,
-  CatTributes,
   initialState,
 } from './catReducer';
 
@@ -17,9 +16,9 @@ const initialFetchState: CatFetchState = {
 };
 function App() {
   const [state, dispatch] = useReducer(catFetchReducer, initialFetchState);
-  const [cats, setCats] = useState<CatTributes>({ id: '', url: '' });
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
+  // const [cats, setCats] = useState<CatTributes>({ id: '', url: '' });
+  // const [loading, setLoading] = useState<boolean>(false);
+  // const [error, setError] = useState<string>('');
 
   // get random cat image from API
   const getCats = async () => {
@@ -34,9 +33,6 @@ function App() {
         dispatch({ type: ActionType.FETCH_ERROR, payload: err.message });
         console.error(err);
       });
-
-    // loading done
-    setLoading(false);
 
     if (!response) {
       dispatch({
@@ -70,19 +66,19 @@ function App() {
   // to load next cat picture
   return (
     <div className='App'>
-      {loading && <p>Loading...</p>}
-      {error && <p data-testid='error'>{error}</p>}
-      {cats.id !== '' && (
+      {state.loading && <p>Loading...</p>}
+      {state.error && <p data-testid='error'>{state.error}</p>}
+      {state.cat.id !== '' && (
         <div style={{ margin: '15px' }}>
           <img
             style={{ height: '50vmin' }}
-            src={cats.url}
-            alt='cute cat photo'
+            src={state.cat.url}
+            alt='cute cat'
           />
           {/* <p>image ID: {cats.id}</p> */}
         </div>
       )}
-      <button disabled={loading} onClick={getCats}>
+      <button disabled={state.loading} onClick={getCats}>
         Get Cute Cat Pic
       </button>
     </div>
