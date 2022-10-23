@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import axios, { AxiosResponse } from 'axios';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 interface CatTributes {
   id: string;
@@ -13,26 +13,32 @@ interface CatTributes {
 const CAT_URL = 'https://api.thecatapi.com/v1';
 
 export async function getCats() {
-  const { data } = await axios.get(CAT_URL);
+  const { data } = await axios.get(`${CAT_URL}/images/search`);
   return data;
 }
 
-export function useCats() {
-  const query = useQuery<CatTributes, Error>(['catPics'], () => getCats());
+export function useCats(page: number) {
+  const query = useQuery<CatTributes[], Error>(
+    ['catPics', page],
+    () => getCats(),
+    { keepPreviousData: true, staleTime: 60000 }
+  );
+
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    queryClient.prefetchQuery(['catPics', page + 1], () => getCats());
+  }, [queryClient, page]);
   return query;
 }
 
 function RandomCat() {
-  // const [cats, setCats] = useState<CatTributes>({ id: '', url: '' });
-  // const [loading, setLoading] = useState<boolean>(false);
-  // const [error, setError] = useState('');
-
-  const { data, isLoading, isError, error } = useCats();
+  const [page, setPage] = useState(1);
+  const { data, isLoading, isError, error } = useCats(page);
 
   // if (!data) return <div></div>;
   console.log(data);
 
-  const { url, id } = data || {};
+  const [{ url, id }] = data || [{}];
 
   // return jsx showing cat picture and button
   // to load next cat picture
@@ -46,7 +52,9 @@ function RandomCat() {
           {/* <p>image ID: {cats.id}</p> */}
         </div>
       )}
-      <button disabled={isLoading}>Get Cute Cat Pic</button>
+      <button disabled={isLoading} onClick={() => setPage(page + 1)}>
+        Get Cute Cat Pic
+      </button>
     </div>
   );
 }
