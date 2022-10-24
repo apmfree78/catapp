@@ -17,7 +17,7 @@ interface VoteProps {
 
 const CAT_URL = 'https://api.thecatapi.com/v1';
 const VOTE_URL = 'https://api.thecatapi.com/v1/votes';
-
+const API_KEY = 'b08e14e2-e1c9-41b9-8ce6-cb76f5ca851f';
 export async function getCats() {
   const { data } = await axios.get(`${CAT_URL}/images/search`);
   return data;
@@ -57,7 +57,12 @@ function RandomCat() {
 
   const queryClient = useQueryClient();
   const resolveVoteMutation = useMutation(
-    (catVote: VoteProps) => axios.post(VOTE_URL, catVote),
+    (catVote: VoteProps) =>
+      axios
+        .post(VOTE_URL, catVote, {
+          headers: { 'x-api-key': API_KEY },
+        })
+        .then((res) => console.log(res)),
     {
       onMutate: async () => {
         await queryClient.cancelQueries(['catPics']);
