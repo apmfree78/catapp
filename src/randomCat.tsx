@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import axios, { AxiosResponse } from 'axios';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface CatTributes {
   id: string;
@@ -10,7 +10,13 @@ interface CatTributes {
   height: number;
 }
 
+interface VoteProps {
+  image_id: string;
+  value: 1 | -1;
+}
+
 const CAT_URL = 'https://api.thecatapi.com/v1';
+const VOTE_URL = 'https://api.thecatapi.com/v1/votes';
 
 export async function getCats() {
   const { data } = await axios.get(`${CAT_URL}/images/search`);
@@ -31,10 +37,33 @@ export function useCats(page: number) {
   return query;
 }
 
+export function useVote(catVote: VoteProps) {
+  const queryClient = useQueryClient();
+  const resolveVoteMutation = useMutation(
+    (catVote: VoteProps) => axios.post(VOTE_URL, catVote),
+    {
+      onMutate: async () => {
+        await queryClient.cancelQueries(['catPics']);
+      },
+    }
+  );
+
+  return resolveVoteMutation;
+}
+
 function RandomCat() {
   const [page, setPage] = useState(1);
   const { data, isLoading, isError, error } = useCats(page);
 
+  const queryClient = useQueryClient();
+  const resolveVoteMutation = useMutation(
+    (catVote: VoteProps) => axios.post(VOTE_URL, catVote),
+    {
+      onMutate: async () => {
+        await queryClient.cancelQueries(['catPics']);
+      },
+    }
+  );
   // if (!data) return <div></div>;
   console.log(data);
 
@@ -55,6 +84,14 @@ function RandomCat() {
       <button disabled={isLoading} onClick={() => setPage(page + 1)}>
         Get Cute Cat Pic
       </button>
+      {id && (
+        <button
+          disabled={isLoading}
+          onClick={() => resolveVoteMutation.mutate({ image_id: id, value: 1 })}
+        >
+          Up Vote
+        </button>
+      )}
     </div>
   );
 }
