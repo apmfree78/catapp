@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import assert from 'assert';
 
 interface VoteProps {
   image_id: string;
@@ -13,13 +14,18 @@ export function getQueryKey(page?: number) {
   return [QUERY_KEY, page];
 }
 
-const CAT_URL = 'https://api.thecatapi.com/v1';
-const VOTE_URL = '${CAT_URL}/votes';
-const API_KEY = 'b08e14e2-e1c9-41b9-8ce6-cb76f5ca851f';
-
 export async function postCatVotes(catVote: VoteProps) {
-  return await axios.post(VOTE_URL, catVote, {
-    headers: { 'x-api-key': API_KEY },
+  assert(
+    process.env.REACT_APP_VOTE_URL,
+    'env variable not set:process.env.REACT_APP_VOTE_URL'
+  );
+  assert(
+    process.env.REACT_APP_API_KEY,
+    'env variable not set:process.env.REACT_APP_API_KEY'
+  );
+
+  return await axios.post(process.env.REACT_APP_VOTE_URL, catVote, {
+    headers: { 'x-api-key': process.env.REACT_APP_API_KEY },
   });
 }
 
