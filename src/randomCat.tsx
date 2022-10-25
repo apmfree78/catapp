@@ -2,58 +2,12 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import axios, { AxiosResponse } from 'axios';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-
-interface CatTributes {
-  id: string;
-  url: string;
-  width: number;
-  height: number;
-}
-
-interface VoteProps {
-  image_id: string;
-  value: 1 | -1;
-}
-
-const CAT_URL = 'https://api.thecatapi.com/v1';
-const VOTE_URL = 'https://api.thecatapi.com/v1/votes';
-const API_KEY = 'b08e14e2-e1c9-41b9-8ce6-cb76f5ca851f';
-export async function getCats() {
-  const { data } = await axios.get(`${CAT_URL}/images/search`);
-  return data;
-}
-
-export function useCats(page: number) {
-  const query = useQuery<CatTributes[], Error>(
-    ['catPics', page],
-    () => getCats(),
-    { keepPreviousData: true, staleTime: 60000 }
-  );
-  const queryClient = useQueryClient();
-  useEffect(() => {
-    queryClient.prefetchQuery(['catPics', page + 1], () => getCats());
-  }, [queryClient, page]);
-  return query;
-}
-
-export function useVote(catVote: VoteProps) {
-  const queryClient = useQueryClient();
-  return useMutation(
-    (catVote: VoteProps) =>
-      axios.post(VOTE_URL, catVote, {
-        headers: { 'x-api-key': API_KEY },
-      }),
-    {
-      onMutate: async () => {
-        await queryClient.cancelQueries(['catPics']);
-      },
-    }
-  );
-}
+import { useCats } from './api/useCat';
+import { useVote } from './api/useVote';
 
 function RandomCat() {
   const [page, setPage] = useState(1);
-  const { data, isLoading, isError, error } = useCats(page);
+  const { data, isLoading, isError } = useCats(page);
   const [{ url, id }] = data || [{}];
   const catVote = useVote({ image_id: id || '', value: 1 });
 
