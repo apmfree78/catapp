@@ -29,7 +29,6 @@ export function useCats(page: number) {
     () => getCats(),
     { keepPreviousData: true, staleTime: 60000 }
   );
-
   const queryClient = useQueryClient();
   useEffect(() => {
     queryClient.prefetchQuery(['catPics', page + 1], () => getCats());
@@ -39,40 +38,26 @@ export function useCats(page: number) {
 
 export function useVote(catVote: VoteProps) {
   const queryClient = useQueryClient();
-  const resolveVoteMutation = useMutation(
-    (catVote: VoteProps) => axios.post(VOTE_URL, catVote),
+  return useMutation(
+    (catVote: VoteProps) =>
+      axios.post(VOTE_URL, catVote, {
+        headers: { 'x-api-key': API_KEY },
+      }),
     {
       onMutate: async () => {
         await queryClient.cancelQueries(['catPics']);
       },
     }
   );
-
-  return resolveVoteMutation;
 }
 
 function RandomCat() {
   const [page, setPage] = useState(1);
   const { data, isLoading, isError, error } = useCats(page);
-
-  const queryClient = useQueryClient();
-  const resolveVoteMutation = useMutation(
-    (catVote: VoteProps) =>
-      axios
-        .post(VOTE_URL, catVote, {
-          headers: { 'x-api-key': API_KEY },
-        })
-        .then((res) => console.log(res)),
-    {
-      onMutate: async () => {
-        await queryClient.cancelQueries(['catPics']);
-      },
-    }
-  );
-  // if (!data) return <div></div>;
-  console.log(data);
-
   const [{ url, id }] = data || [{}];
+  const catVote = useVote({ image_id: id || '', value: 1 });
+
+  console.log(data);
 
   // return jsx showing cat picture and button
   // to load next cat picture
@@ -92,7 +77,7 @@ function RandomCat() {
       {id && (
         <button
           disabled={isLoading}
-          onClick={() => resolveVoteMutation.mutate({ image_id: id, value: 1 })}
+          onClick={() => catVote.mutate({ image_id: id, value: 1 })}
         >
           Up Vote
         </button>
