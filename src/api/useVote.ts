@@ -1,18 +1,8 @@
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import assert from 'assert';
-
-interface VoteProps {
-  image_id: string;
-  value: 1 | -1;
-}
-
-const QUERY_KEY = 'catPics';
-
-export function getQueryKey(page?: number) {
-  if (page === undefined) return [QUERY_KEY];
-  return [QUERY_KEY, page];
-}
+import { getQueryKey } from './queryKey';
+import { VoteProps } from './types';
 
 export async function postCatVotes(catVote: VoteProps) {
   assert(
