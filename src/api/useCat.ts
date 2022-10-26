@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react';
-import axios, { AxiosResponse } from 'axios';
+import { axios } from './axios';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getQueryKey } from './queryKey';
-import { CatTributes } from './types'
+import { CatTributes } from './types';
 
 export async function getCats() {
-  const { data } = await axios.get(
-    `${process.env.REACT_APP_CAT_URL}/images/search`
-  );
+  const { data } = await axios.get('/images/search');
   return data;
 }
 

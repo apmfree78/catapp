@@ -1,4 +1,3 @@
-
 const QUERY_KEY = 'catPics';
 
 export function getQueryKey(page?: number) {

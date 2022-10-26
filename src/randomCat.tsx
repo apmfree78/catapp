@@ -1,7 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import './App.css';
-import axios, { AxiosResponse } from 'axios';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCats } from './api/useCat';
 import { useVote } from './api/useVote';
 
@@ -11,7 +9,7 @@ function RandomCat() {
   const [{ url, id }] = data || [{}];
   const catVote = useVote({ image_id: id || '', value: 1 });
 
-  console.log(data);
+  // console.log(data);
 
   // return jsx showing cat picture and button
   // to load next cat picture

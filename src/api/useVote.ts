@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { axios } from './axios';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import assert from 'assert';
 import { getQueryKey } from './queryKey';
@@ -14,9 +14,12 @@ export async function postCatVotes(catVote: VoteProps) {
     'env variable not set:process.env.REACT_APP_API_KEY'
   );
 
-  return await axios.post(process.env.REACT_APP_VOTE_URL, catVote, {
-    headers: { 'x-api-key': process.env.REACT_APP_API_KEY },
-  });
+  return await axios
+    .post('/votes', catVote, {
+      headers: { 'x-api-key': process.env.REACT_APP_API_KEY },
+    })
+    .then((res) => console.log(res))
+    .catch((err) => console.error(err));
 }
 
 export function useVote(catVote: VoteProps) {
