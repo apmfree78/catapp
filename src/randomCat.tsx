@@ -1,77 +1,39 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import './App.css';
-import axios, { AxiosResponse } from 'axios';
-import { useQuery } from '@tanstack/react-query'
-
-interface CatTributes {
-  id: string;
-  url: string;
-}
-
-const CAT_URL = 'https://api.thecatapi.com/v1';
+import { useCats } from './api/useCat';
+import { useVote } from './api/useVote';
 
 function RandomCat() {
-  const [cats, setCats] = useState<CatTributes>({ id: '', url: '' });
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState('');
+  const [page, setPage] = useState(1);
+  const { data, isLoading, isError } = useCats(page);
+  const [{ url, id }] = data || [{}];
+  const catVote = useVote({ image_id: id || '', value: 1 });
 
-  // get random cat image from API
-  const getCats = async () => {
-    // loading state begins
-    setLoading(true);
-    setError('');
-
-    // grab random cat photo
-    const response: void | AxiosResponse = await axios
-      .get(`${CAT_URL}/images/search`)
-      .catch((err) => {
-        // set error state
-        setError(err.message);
-        setLoading(false);
-        console.error(err);
-      });
-
-    // loading done
-    setLoading(false);
-
-    if (!response) {
-      setError('no cat images found! sorry!');
-      return;
-    }
-
-    // extracting data
-    const { data } = response;
-    const [{ url, id }] = data;
-    console.log({ url, id });
-
-    // setting state
-    setCats({ url, id });
-  };
-
-  // load random cat image on load
-  useEffect(() => {
-    getCats();
-  }, []);
+  // console.log(data);
 
   // return jsx showing cat picture and button
   // to load next cat picture
   return (
     <div className='App'>
-      {loading && <p>Loading...</p>}
-      {error && <p data-testid='error'>{error}</p>}
-      {cats.id !== '' && (
+      {isLoading && <p>Loading...</p>}
+      {isError && <p data-testid='error'>'Error'</p>}
+      {id !== '' && (
         <div style={{ margin: '15px' }}>
-          <img
-            style={{ height: '50vmin' }}
-            src={cats.url}
-            alt='cute cat photo'
-          />
+          <img style={{ height: '50vmin' }} src={url} alt='cute cat photo' />
           {/* <p>image ID: {cats.id}</p> */}
         </div>
       )}
-      <button disabled={loading} onClick={getCats}>
+      <button disabled={isLoading} onClick={() => setPage(page + 1)}>
         Get Cute Cat Pic
       </button>
+      {id && (
+        <button
+          disabled={isLoading}
+          onClick={() => catVote.mutate({ image_id: id, value: 1 })}
+        >
+          Up Vote
+        </button>
+      )}
     </div>
   );
 }
