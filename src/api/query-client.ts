@@ -1,6 +1,6 @@
 // api/query-client.ts
 
-import { QueryClient } from "@tanstack/react-query";
+import { QueryClient } from '@tanstack/react-query';
 
 const defaultQueryConfig = { staleTime: 60000 };
 

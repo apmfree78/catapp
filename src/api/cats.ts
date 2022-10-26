@@ -2,8 +2,11 @@ import { axios } from './axios';
 import assert from 'assert';
 import { VoteProps } from './types';
 
+const VOTE_ENDPOINT = '/votes';
+const CAT_ENDPOINT = '/images/search';
+
 export async function getCats() {
-  const { data } = await axios.get('/images/search');
+  const { data } = await axios.get(CAT_ENDPOINT);
   return data;
 }
 
@@ -18,7 +21,7 @@ export async function postCatVotes(catVote: VoteProps) {
   );
 
   return await axios
-    .post('/votes', catVote)
+    .post(VOTE_ENDPOINT, catVote)
     .then((res) => console.log(res))
     .catch((err) => console.error(err));
 }
