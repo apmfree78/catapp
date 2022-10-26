@@ -15,9 +15,8 @@ export async function postCatVotes(catVote: VoteProps) {
   );
 
   return await axios
-    .post('/votes', catVote, {
-      headers: { 'x-api-key': process.env.REACT_APP_API_KEY },
-    })
+    .post('/votes', catVote
+    )
     .then((res) => console.log(res))
     .catch((err) => console.error(err));
 }
